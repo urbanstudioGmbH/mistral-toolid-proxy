@@ -189,6 +189,3 @@ A representative sample (verify exact links before relying on them):
 Every one of these was solved in place, for one tool. This repo is the same fix,
 in a place anyone can reuse.
 
-## License
-
-Apache-2.0 suggested (drop your `LICENSE` of choice in the repo root).
