@@ -18,8 +18,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY mistral_toolid_proxy.py .
 
 # Run unprivileged.
-RUN useradd --system --no-create-home --uid 10001 proxy
-USER proxy
+RUN useradd --system --no-create-home --uid 10001 mistral-toolid-proxy
+USER mistral-toolid-proxy
 
 # Runtime config — override at `docker run` time (-e / --env-file).
 # UPSTREAM must point at wherever your Mistral endpoint actually listens.

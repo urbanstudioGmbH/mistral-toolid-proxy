@@ -50,6 +50,7 @@ import os
 import json
 import string
 import hashlib
+from contextlib import asynccontextmanager
 
 import httpx
 import uvicorn
@@ -144,9 +145,15 @@ async def proxy(request):
     )
 
 
+@asynccontextmanager
+async def lifespan(_app):
+    yield
+    await client.aclose()
+
+
 app = Starlette(
     routes=[Route("/{path:path}", proxy, methods=["GET", "POST", "PUT", "DELETE", "PATCH"])],
-    on_shutdown=[client.aclose],
+    lifespan=lifespan,
 )
 
 
