@@ -1,0 +1,5 @@
+# mistral_toolid_proxy runtime dependencies.
+# Floors are conservative; pin exact versions if you want reproducible builds.
+starlette>=0.37
+httpx>=0.27
+uvicorn[standard]>=0.30

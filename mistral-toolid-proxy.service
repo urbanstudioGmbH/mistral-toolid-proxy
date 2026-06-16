@@ -1,0 +1,47 @@
+# mistral_toolid_proxy — systemd unit.
+#
+# Install:
+#   sudo mkdir -p /opt/mistral-toolid-proxy
+#   sudo cp mistral_toolid_proxy.py requirements.txt /opt/mistral-toolid-proxy/
+#   sudo python3 -m venv /opt/mistral-toolid-proxy/venv
+#   sudo /opt/mistral-toolid-proxy/venv/bin/pip install -r /opt/mistral-toolid-proxy/requirements.txt
+#   sudo install -m 600 mistral-toolid-proxy.env.example /etc/mistral-toolid-proxy.env   # then edit
+#   sudo cp mistral-toolid-proxy.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now mistral-toolid-proxy
+#
+[Unit]
+Description=Mistral tool-call-ID normalizing proxy
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Secret (API_KEY) and config live here, root-readable only. The leading '-'
+# makes it optional, so the service still starts on script defaults if absent.
+EnvironmentFile=-/etc/mistral-toolid-proxy.env
+ExecStart=/opt/mistral-toolid-proxy/venv/bin/python /opt/mistral-toolid-proxy/mistral_toolid_proxy.py
+Restart=on-failure
+RestartSec=2
+
+# --- Hardening. This service only opens a socket and forwards bytes; it
+# --- never writes to disk, so it can run fully sandboxed.
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=yes
+LockPersonality=yes
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+# If a native wheel (uvloop/httptools) ever refuses to start, drop this line:
+MemoryDenyWriteExecute=yes
+
+[Install]
+WantedBy=multi-user.target
